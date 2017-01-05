@@ -14,6 +14,8 @@ void SPIy_MspInit(void)
   /* Enable GPIO clock */
   TOUCH_SPIx_SCK_GPIO_CLK_ENABLE();
   TOUCH_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
+  TOUCH_CS_GPIO_CLK_ENABLE();
+  TOUCH_IRQ_GPIO_CLK_ENABLE();
 
   /* Configure SPI SCK */
   gpioinitstruct.Pin        = TOUCH_SPIx_SCK_PIN | TOUCH_SPIx_MOSI_PIN;
@@ -22,7 +24,7 @@ void SPIy_MspInit(void)
   HAL_GPIO_Init(TOUCH_SPIx_SCK_GPIO_PORT, &gpioinitstruct);
 
   gpioinitstruct.Pin        = TOUCH_SPIx_MISO_PIN;
-  gpioinitstruct.Mode       = GPIO_MODE_INPUT;
+  gpioinitstruct.Mode       = GPIO_MODE_AF_INPUT;
   HAL_GPIO_Init(TOUCH_SPIx_MISO_MOSI_GPIO_PORT, &gpioinitstruct);
 
   /*** Configure the SPI peripheral ***/

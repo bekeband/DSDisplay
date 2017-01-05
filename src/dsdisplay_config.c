@@ -607,7 +607,7 @@ static void TOUCH_SPIx_Init(void)
           - SD card SPI interface max baudrate is 25MHz for write/read
           - PCLK2 max frequency is 32 MHz
        */
-    TOUCH_SPI_HANDLE.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_8;
+    TOUCH_SPI_HANDLE.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_256;
     TOUCH_SPI_HANDLE.Init.Direction          = SPI_DIRECTION_2LINES;
     TOUCH_SPI_HANDLE.Init.CLKPhase           = SPI_PHASE_1EDGE;
     TOUCH_SPI_HANDLE.Init.CLKPolarity        = SPI_POLARITY_LOW;
@@ -615,7 +615,7 @@ static void TOUCH_SPIx_Init(void)
     TOUCH_SPI_HANDLE.Init.CRCPolynomial      = 7;
     TOUCH_SPI_HANDLE.Init.DataSize           = SPI_DATASIZE_8BIT;
     TOUCH_SPI_HANDLE.Init.FirstBit           = SPI_FIRSTBIT_MSB;
-    TOUCH_SPI_HANDLE.Init.NSS                = SPI_NSS_HARD_OUTPUT;
+    TOUCH_SPI_HANDLE.Init.NSS                = SPI_NSS_SOFT;
     TOUCH_SPI_HANDLE.Init.TIMode             = SPI_TIMODE_DISABLE;
     TOUCH_SPI_HANDLE.Init.Mode               = SPI_MODE_MASTER;
 
@@ -633,7 +633,7 @@ static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t
 {
   HAL_StatusTypeDef status = HAL_OK;
   
-  status = HAL_SPI_TransmitReceive(&TFT_SPI_HANDLE, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
+  status = HAL_SPI_TransmitReceive(&TOUCH_SPI_HANDLE, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
   
   /* Check the communication status */
   if(status != HAL_OK)
@@ -725,13 +725,13 @@ void SD_IO_Init(void)
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
 
-  /* Configure LCD_CS_PIN pin: LCD Card CS pin */
+  /* Configure LCD_CS_PIN pin: LCD Card CS pin
   gpioinitstruct.Pin   = LCD_CS_PIN;
   gpioinitstruct.Mode  = GPIO_MODE_OUTPUT_PP;
   gpioinitstruct.Pull  = GPIO_NOPULL;
   gpioinitstruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-  LCD_CS_HIGH();
+  LCD_CS_HIGH();*/
   /*------------Put SD in SPI mode--------------*/
   /* SD SPI Config */
   SPIx_Init();
@@ -853,6 +853,12 @@ void TOUCH_IO_Init(void)
   gpioinitstruct.Mode   = GPIO_MODE_INPUT;
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LCD_DC_GPIO_PORT, &gpioinitstruct);
+
+  /*  Configure LCD DC, and Reset pins. */
+  gpioinitstruct.Pin    = TOUCH_CS_PIN;
+  gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
+  gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct);
 
   /* TOUCH SPI Config */
   TOUCH_SPIx_Init();

@@ -56,6 +56,7 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
+#include "IOConfigs.h"
 #include "stm32f1xx_hal.h"
 #include "stdint.h"
    
@@ -145,11 +146,10 @@ void LCD_IO_WriteReg(uint8_t LCDReg);
 void InitLCD();
 void FillRectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color);
 void DrawGIMPImage(uint16_t x, uint16_t y, const struct s_image image);
-
+void SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
+uint8_t SD_IO_WriteByte(uint8_t Data);
 
 SPI_HandleTypeDef* GetTFTHandlePtr();
-
-
 
 /**
   * @}
@@ -167,7 +167,13 @@ void TOUCH_IO_Init(void);
   */  
 #define SD_CS_LOW()       HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_RESET)
 #define SD_CS_HIGH()      HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_SET)
-    
+
+/**
+  * @brief  TOUCH IC Control Lines management
+  */
+#define TOUCH_CS_LOW()       HAL_GPIO_WritePin(TOUCH_CS_GPIO_PORT, TOUCH_CS_PIN, GPIO_PIN_RESET)
+#define TOUCH_CS_HIGH()      HAL_GPIO_WritePin(TOUCH_CS_GPIO_PORT, TOUCH_CS_PIN, GPIO_PIN_SET)
+
 /**
   * @brief  LCD Control Lines management
   */
@@ -186,23 +192,6 @@ void TOUCH_IO_Init(void);
 #define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
 #define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
 
-/**
-  * @brief  TOUCH Control Interface pins (XPT2046 SPI IC)
-  */
-
-#define TOUCH_CS_PIN                               GPIO_PIN_12
-#define TOUCH_CS_GPIO_PORT                         GPIOB
-#define TOUCH_CS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOB_CLK_ENABLE()
-#define TOUCH_CS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOB_CLK_DISABLE()
-
-/**
-  * @brief  TOUCH controller IRQ output pin
-  */
-
-#define TOUCH_IRQ_PIN                               GPIO_PIN_10
-#define TOUCH_IRQ_GPIO_PORT                         GPIOB
-#define TOUCH_IRQ_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOB_CLK_ENABLE()
-#define TOUCH_IRQ_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOB_CLK_DISABLE()
 
 /**
   * @brief  LCD Control Interface pins (shield D10)

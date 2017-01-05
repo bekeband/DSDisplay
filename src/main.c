@@ -108,8 +108,22 @@ int main(void)
   BSP_TFT_BACKLED_Init(LED_GREEN);
   LCD_IO_Init();
   TOUCH_IO_Init();
+  uint8_t COMM;
+  uint8_t i;
+  uint8_t OD[3] = {0b10000000, 0x00, 0x00};
+
+  for (i = 0; i < 5; i++)
+    {
+      COMM = 0x80 | (i << 4);
+      TOUCH_CS_LOW();
+      SD_IO_WriteByte(COMM);
+      SD_IO_ReadData((uint8_t*)&OD, 2);
+      TOUCH_CS_HIGH();
+    }
 
   InitLCD();
+
+
 
   DisplayOn();
   DrawGIMPImage(10, 20, button);
