@@ -55,11 +55,17 @@ extern struct s_image button;
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+char SDPath[4]; /* SD card logical drive path */
+
+/* Private variables ---------------------------------------------------------*/
 /* SPI handler declaration */
 SPI_HandleTypeDef SpiHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void Error_Handler(void);
 
 /*********************************************************************
 *
@@ -88,6 +94,12 @@ void SystemClock_Config(void);
 int main(void)
 {
 
+  FRESULT res;                                          /* FatFs function common result code */
+  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t rtext[100];                                   /* File read buffer */
+
+
   /* STM32F103xB HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
@@ -102,31 +114,88 @@ int main(void)
 
   /* Configure the system clock to 64 MHz */
   SystemClock_Config();
-
+#define Z_THRESHOLD     400
   /* Add your application code here
      */
   BSP_TFT_BACKLED_Init(LED_GREEN);
   LCD_IO_Init();
   TOUCH_IO_Init();
+//  SD_IO_Init();
+
+  /*##-1- Link the micro SD disk I/O driver ##################################*/
+  if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
+  {
+      if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) == FR_OK)
+      {
+	  /*##-3- Create a FAT file system (format) on the logical drive #########*/
+	  /* WARNING: Formatting the uSD card will delete all content on the device */
+	  if(f_mkfs((TCHAR const*)SDPath, 0, 0) == FR_OK)
+	  {
+	      /*##-4- Create and Open a new text file object with write access #####*/
+/*	      if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+	      {
+
+	      } else*/
+		  /* 'STM32.TXT' file Open for write Error */
+		Error_Handler();
+	  } else
+	    /* FatFs Format Error */
+	    Error_Handler();
+      } else
+        /* FatFs Initialization Error */
+        Error_Handler();
+  };
+
+
   uint8_t COMM;
   uint8_t i;
-  uint8_t OD[3] = {0b10000000, 0x00, 0x00};
+  uint16_t RD;
+  uint16_t z;
+  uint16_t DT[6];
 
-  for (i = 0; i < 5; i++)
+  TOUCH_CS_LOW();
+  SD_IO_WriteByte(0xB1);
+  SD_IO_WriteByte(0xC1);
+  SD_IO_ReadData((uint8_t*)&RD, 2);
+  RD = RD >> 3;
+  z = RD + 4095;
+  SD_IO_WriteByte(0x91);
+  SD_IO_ReadData((uint8_t*)&RD, 2);
+  RD = RD >> 3;
+  z -= RD;
+  if (z >= Z_THRESHOLD)
     {
-      COMM = 0x80 | (i << 4);
-      TOUCH_CS_LOW();
-      SD_IO_WriteByte(COMM);
-      SD_IO_ReadData((uint8_t*)&OD, 2);
-      TOUCH_CS_HIGH();
+      SD_IO_WriteByte(0x91);
+      SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+      SD_IO_WriteByte(0xD1);
+      SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+      DT[0] = RD >> 3;
+      SD_IO_WriteByte(0x91);
+      SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+      DT[1] = RD >> 3;
+      SD_IO_WriteByte(0xD1);
+      SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+      DT[2] = RD >> 3;
+      SD_IO_WriteByte(0x91);
+      SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+      DT[3] = RD >> 3;
     }
+  else { DT[0] = DT[1] = DT[2] = DT[3] = 0;};	// Compiler warns these values may be used unset on early exit.
+    SD_IO_WriteByte(0x91);
+    SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+    DT[4] = RD >> 3;
+    SD_IO_WriteByte(0x00);
+    SD_IO_ReadData((uint8_t*)&RD, 2);	// dummy X measure, 1st is always noisy
+    DT[5] = RD >> 3;
+    z = 0;
+  TOUCH_CS_HIGH();
 
   InitLCD();
 
 
 
   DisplayOn();
-  DrawGIMPImage(10, 20, button);
+  DrawGIMPImage(RD, 20, button);
   while (1);
   /* Infinite loop */
   while (1)
@@ -194,6 +263,22 @@ void SystemClock_Config(void)
     while(1); 
   }
 }
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @param  None
+  * @retval None
+  */
+static void Error_Handler(void)
+{
+  while(1)
+  {
+    /* Toggle LED_RED fast */
+//    BSP_LED_Toggle(LED_RED);
+    HAL_Delay(40);
+  }
+}
+
 
 #ifdef  USE_FULL_ASSERT
 

@@ -138,13 +138,15 @@ static void               SPIx_Error (void);
 //static void               SPIx_MspInit(void);
 
 /* SD IO functions */
-void                      SD_IO_Init(void);
+/*void                      SD_IO_Init(void);
 void                      SD_IO_CSState(uint8_t state);
 void                      SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
 void                      SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
 void                      SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
 uint8_t                   SD_IO_WriteByte(uint8_t Data);
-uint8_t                   SD_IO_ReadByte(void);
+uint8_t                   SD_IO_ReadByte(void);*/
+
+
 
 /* LCD IO functions */
 //void                      LCD_IO_Init(void);
@@ -725,16 +727,9 @@ void SD_IO_Init(void)
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
 
-  /* Configure LCD_CS_PIN pin: LCD Card CS pin
-  gpioinitstruct.Pin   = LCD_CS_PIN;
-  gpioinitstruct.Mode  = GPIO_MODE_OUTPUT_PP;
-  gpioinitstruct.Pull  = GPIO_NOPULL;
-  gpioinitstruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-  LCD_CS_HIGH();*/
   /*------------Put SD in SPI mode--------------*/
   /* SD SPI Config */
-  SPIx_Init();
+//  SPIx_Init();
 
   /* SD chip select high */
   SD_CS_HIGH();
@@ -790,6 +785,21 @@ uint8_t SD_IO_WriteByte(uint8_t Data)
   /* Send the byte */
   SPIx_WriteReadData(&Data,&tmp,1);
   return tmp;
+}
+
+/**
+  * @brief  Read a byte from the SD.
+  * @retval The received byte.
+  */
+uint8_t SD_IO_ReadByte(void)
+{
+  uint8_t data = 0;
+
+  /* Get the received data */
+//  data = SPIx_Read();
+
+  /* Return the shifted data */
+  return data;
 }
 
 /**
@@ -863,6 +873,7 @@ void TOUCH_IO_Init(void)
   /* TOUCH SPI Config */
   TOUCH_SPIx_Init();
 
+  TOUCH_CS_HIGH();
 }
 
 /**

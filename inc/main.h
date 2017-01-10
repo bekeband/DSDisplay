@@ -42,6 +42,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "dsdisplay_config.h"
+
+/* FatFs includes component */
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

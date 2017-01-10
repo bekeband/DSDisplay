@@ -156,6 +156,7 @@ SPI_HandleTypeDef* GetTFTHandlePtr();
   */
 
 void TOUCH_IO_Init(void);
+void SD_IO_Init(void);
 
 /**
   * @}
@@ -184,38 +185,7 @@ void TOUCH_IO_Init(void);
 #define LCD_RST_LOW()     HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
 #define LCD_RST_HIGH()    HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
 
-/**
-  * @brief  SD Control Interface pins (shield D4)
-  */
-#define SD_CS_PIN                                 GPIO_PIN_5
-#define SD_CS_GPIO_PORT                           GPIOB
-#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
 
-
-/**
-  * @brief  LCD Control Interface pins (shield D10)
-  */
-#define LCD_CS_PIN                                 GPIO_PIN_4
-#define LCD_CS_GPIO_PORT                           GPIOA
-#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-/**
-  * @brief  LCD Data/Command Interface pins
-  */
-#define LCD_DC_PIN                                 GPIO_PIN_1
-#define LCD_DC_GPIO_PORT                           GPIOA
-#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-/**
-  * @brief  LCD Reset Pin
-  */
-#define LCD_RST_PIN                                 GPIO_PIN_3
-#define LCD_RST_GPIO_PORT                           GPIOA
-#define LCD_RST_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define LCD_RST_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
 
 /*##################### ADC1 ###################################*/
 /**

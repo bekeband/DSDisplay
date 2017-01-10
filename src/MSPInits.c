@@ -56,10 +56,6 @@ void SPIx_MspInit(void)
   gpioinitstruct.Pin        = LCD_SPIx_MOSI_PIN;
   HAL_GPIO_Init(LCD_SPIx_MISO_MOSI_GPIO_PORT, &gpioinitstruct);
 
-  /* Configure SPI NSS
-  gpioinitstruct.Pin        = LCD_CS_PIN;
-  HAL_GPIO_Init(LCD_CS_GPIO_PORT, &gpioinitstruct);*/
-
   gpioinitstruct.Pin        = LCD_SPIx_MISO_PIN;
   gpioinitstruct.Mode       = GPIO_MODE_INPUT;
   HAL_GPIO_Init(LCD_SPIx_MISO_MOSI_GPIO_PORT, &gpioinitstruct);
